@@ -4,11 +4,9 @@ google.maps.event.addDomListener(window, 'load', function(){
 
         const myLatLng = {lat: ubicacion.latitude, lng: ubicacion.longitude};
 
-        var texto = '<h1> Nombre del lugar </h1>' + '<p> Descripción del lugar</p>' + '<a href="https://www.google.com">Página web</a>';
-
         const options = {
             center: myLatLng,
-            zoom: 15
+            zoom: 14
         }
 
         var map = document.getElementById('map');
@@ -17,13 +15,10 @@ google.maps.event.addDomListener(window, 'load', function(){
 
         const marcador = new google.maps.Marker({
             position: myLatLng,
-            map: mapa,
-            title: 'Marcador'
+            map: mapa
         });
 
-        var informacion = new google.maps.InfoWindow({
-            content: texto
-        });
+        var informacion = new google.maps.InfoWindow();
 
         marcador.addListener('click', function(){
             informacion.open(mapa, marcador);
@@ -33,5 +28,45 @@ google.maps.event.addDomListener(window, 'load', function(){
 
         const search = new google.maps.places.Autocomplete(autocomplete);
         search.bindTo('bounds', mapa);
+
+        search.addListener('placce_changed', function(){
+
+            informacion.close();
+            marcador.setVisible(false);
+
+            var place = search.getPlace();
+
+            if (!place.geometry.viewport){
+
+                window.alert('Errro al mostrar el lugar');
+                return;
+            }
+
+            if(place.geometry.viewport){
+                
+                mapa.fitBounds(place.geometry.viewport);
+            }else{
+
+                mapa.setCenter(place.geometry.location);
+                mapa.setZoom(18);
+            }
+
+                marcador.setPosition(place.geometry.location);
+                marcador.setVisible(true);
+                
+                var address = "";
+
+                if (place.address_components) {
+
+                    address = [
+                        (places.address_components[0] && place.address_components[0].short_name || ''),
+                        (places.address_components[1] && place.address_components[1].short_name || ''),
+                        (places.address_components[2] && place.address_components[2].short_name || ''),
+                    ];
+                }
+
+                informacion.setContent('<div><strong>'+ place.name +'</strong><br>'+ address);
+                informacion.open(map,marcador);
+        });
     });
 });

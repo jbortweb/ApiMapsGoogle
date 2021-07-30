@@ -38,7 +38,7 @@ google.maps.event.addDomListener(window, 'load', function(){
 
             if (!place.geometry.viewport){
 
-                window.alert('Errro al mostrar el lugar');
+                window.alert('Error al mostrar el lugar');
                 return;
             }
 
